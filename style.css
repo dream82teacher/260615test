@@ -1,0 +1,826 @@
+/* 🏫 우리 반 자리 배치 프로그램 스타일시트 */
+
+:root {
+  /* 파스텔톤 컬러 시스템 정의 */
+  --bg-color: #f7f9fc;
+  --sidebar-bg: #ffffff;
+  --text-main: #2d3748;
+  --text-muted: #718096;
+  
+  --primary-color: #7f9cf5;      /* 파스텔 블루 */
+  --primary-hover: #667eea;
+  --secondary-color: #68d391;    /* 파스텔 그린 */
+  --secondary-hover: #48bb78;
+  --danger-color: #fc8181;       /* 파스텔 레드 */
+  --danger-hover: #f56565;
+  
+  --border-color: #e2e8f0;
+  --card-shadow: 0 8px 16px rgba(142, 153, 185, 0.12);
+  --sidebar-shadow: 4px 0 20px rgba(0, 0, 0, 0.04);
+  
+  /* 학생 카드용 다양한 파스텔톤 배경 (순환 적용용) */
+  --pastel-blue: #ebf4ff;
+  --pastel-blue-border: #bee3f8;
+  --pastel-blue-text: #2b6cb0;
+  
+  --pastel-pink: #fff5f5;
+  --pastel-pink-border: #fed7d7;
+  --pastel-pink-text: #c53030;
+  
+  --pastel-green: #f0fff4;
+  --pastel-green-border: #c6f6d5;
+  --pastel-green-text: #2f855a;
+  
+  --pastel-yellow: #fffff0;
+  --pastel-yellow-border: #fefcbf;
+  --pastel-yellow-text: #b7791f;
+
+  --pastel-purple: #faf5ff;
+  --pastel-purple-border: #e9d8fd;
+  --pastel-purple-text: #6b46c1;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Nanum Gothic', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+body, html {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+}
+
+/* 메인 레이아웃 컨테이너 */
+.app-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+}
+
+/* 사이드바 스타일 */
+.sidebar {
+  width: 360px;
+  min-width: 360px;
+  background-color: var(--sidebar-bg);
+  padding: 30px 24px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border-color);
+  box-shadow: var(--sidebar-shadow);
+  z-index: 10;
+  overflow-y: auto;
+  transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+}
+
+/* 사이드바 접혔을 때 상태 */
+.sidebar.collapsed {
+  margin-left: -360px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.logo-emoji {
+  font-size: 2rem;
+}
+
+.sidebar-header h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #4a5568;
+}
+
+/* 입력 그룹 */
+.input-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-group label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #4a5568;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.helper-text {
+  font-size: 0.8rem;
+  font-weight: normal;
+  color: var(--text-muted);
+}
+
+textarea#student-names {
+  width: 100%;
+  height: 160px;
+  padding: 12px;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  resize: none;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: #f8fafc;
+}
+
+textarea#student-names:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(127, 156, 245, 0.2);
+  background-color: #ffffff;
+}
+
+.input-actions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.example-load-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.example-load-container input[type="number"] {
+  width: 46px;
+  padding: 3px 4px;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  text-align: center;
+  font-weight: 700;
+  outline: none;
+  background-color: #f8fafc;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.example-load-container input[type="number"]:focus {
+  border-color: var(--primary-color);
+  background-color: #ffffff;
+}
+
+.btn-text-link {
+  background: none;
+  border: none;
+  color: var(--primary-hover);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: background-color 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.btn-text-link:hover {
+  background-color: #ebf4ff;
+  color: var(--primary-color);
+}
+
+.student-count-badge {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.student-count-badge span {
+  color: var(--primary-hover);
+}
+
+/* 행/열 격자 설정 행 */
+.grid-setting-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 15px;
+}
+
+.grid-setting-row .input-group {
+  flex: 1;
+}
+
+.grid-setting-row input[type="number"] {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 1rem;
+  text-align: center;
+  font-weight: 700;
+  outline: none;
+  transition: border-color 0.2s;
+  background-color: #f8fafc;
+}
+
+.grid-setting-row input[type="number"]:focus {
+  border-color: var(--primary-color);
+  background-color: #ffffff;
+}
+
+/* 상태 정보 요약 */
+.status-summary {
+  background-color: #f7fafc;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #4a5568;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid #edf2f7;
+}
+
+#seat-status-message {
+  font-size: 0.8rem;
+  font-weight: normal;
+}
+
+.status-error {
+  color: var(--danger-color);
+  font-weight: bold;
+}
+
+.status-ok {
+  color: var(--secondary-hover);
+}
+
+/* 버튼 그룹 */
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: auto; /* 푸터를 하단으로 밀어냄 */
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  border: none;
+  border-radius: 50px; /* 아주 둥근 파스텔 버튼 */
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s, background-color 0.2s, box-shadow 0.2s;
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+}
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+  box-shadow: 0 6px 12px rgba(110, 137, 245, 0.3);
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+}
+.btn-secondary:hover {
+  background-color: var(--secondary-hover);
+  box-shadow: 0 6px 12px rgba(72, 187, 120, 0.3);
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+}
+.btn-danger:hover {
+  background-color: var(--danger-hover);
+  box-shadow: 0 6px 12px rgba(245, 101, 101, 0.3);
+}
+
+.sidebar-footer {
+  margin-top: 30px;
+  padding-top: 15px;
+  border-top: 1px solid var(--border-color);
+}
+
+.sidebar-footer p {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* 메인 콘텐츠 영역 */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 40px 40px 40px;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 헤더 및 컨트롤러 */
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  height: 48px;
+}
+
+.btn-toggle {
+  background: white;
+  border: 1px solid var(--border-color);
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #4a5568;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  transition: background 0.2s;
+}
+
+.btn-toggle:hover {
+  background: #f7fafc;
+}
+
+.display-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  padding: 6px 12px;
+  border-radius: 30px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.control-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-right: 4px;
+}
+
+.btn-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: #f7fafc;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-circle:hover {
+  background: #edf2f7;
+  transform: scale(1.05);
+}
+
+.btn-circle:active {
+  transform: scale(0.95);
+}
+
+.font-size-text {
+  font-size: 0.85rem;
+  font-weight: 700;
+  width: 45px;
+  text-align: center;
+}
+
+.btn-fullscreen-toggle {
+  font-size: 0.95rem;
+  background-color: #ebf8ff;
+  border-color: #bee3f8;
+}
+
+.btn-fullscreen-toggle:hover {
+  background-color: #e2f4ff;
+}
+
+/* 교학 구조 - 교실 앞쪽 안내 (칠판) */
+.classroom-front {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+.chalkboard {
+  background-color: #8ea89d; /* 부드러운 파스텔톤 그린 */
+  color: #ffffff;
+  border: 8px solid #dfcbb5; /* 연한 나무색 파스텔 톤 테두리 */
+  border-radius: 12px;
+  padding: 12px 20px;
+  font-size: 1.3rem;
+  font-weight: 800;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  letter-spacing: 4px;
+  position: relative;
+  
+  /* 가로 길이를 2배로 확장 (반응형 퍼센트와 max-width 조합) */
+  width: 80%;
+  max-width: 800px;
+  min-width: 280px;
+}
+
+/* 칠판 밑의 지우개/분필 데코레이션 */
+.chalkboard::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  right: 40px;
+  width: 60px;
+  height: 6px;
+  background: #f7fafc;
+  border-radius: 2px;
+  opacity: 0.9;
+}
+
+/* 격자 영역 래퍼 */
+.grid-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: auto;
+  padding: 10px;
+}
+
+/* 자리 카드 그리드 */
+.seating-grid {
+  display: grid;
+  gap: 15px; /* 사각형 사이 거리를 15px로 설정 */
+  justify-content: center;
+  align-content: center;
+  justify-items: center;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+/* 자리 카드 공통 스타일 */
+.seat-card {
+  background: white;
+  border-radius: 16px;
+  border: 3px solid var(--border-color);
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  aspect-ratio: 1.35 / 1; /* 카드 비율 소폭 조절 */
+  padding: 10px;
+  position: relative;
+  font-size: 1.55rem; /* 기본 글자 크기 상향 (기존 1.3rem) */
+  font-weight: 800;
+  transition: transform 0.2s, box-shadow 0.2s;
+  user-select: none;
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  
+  /* 사각형 크기는 그리드 트랙의 크기에 맞춰 100%로 설정 */
+  width: 100%;
+}
+
+.seat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(142, 153, 185, 0.2);
+}
+
+.student-name {
+  font-size: 1.25em; /* 이름 글자 크기 추가 상향 */
+  word-break: keep-all;
+  text-align: center;
+}
+
+/* 학생 정보 카드 스타일 (순환 파스텔톤 클래스) */
+.student-card-style-0 {
+  background-color: var(--pastel-blue);
+  border-color: var(--pastel-blue-border);
+  color: var(--pastel-blue-text);
+}
+.student-card-style-1 {
+  background-color: var(--pastel-pink);
+  border-color: var(--pastel-pink-border);
+  color: var(--pastel-pink-text);
+}
+.student-card-style-2 {
+  background-color: var(--pastel-green);
+  border-color: var(--pastel-green-border);
+  color: var(--pastel-green-text);
+}
+.student-card-style-3 {
+  background-color: var(--pastel-yellow);
+  border-color: var(--pastel-yellow-border);
+  color: var(--pastel-yellow-text);
+}
+.student-card-style-4 {
+  background-color: var(--pastel-purple);
+  border-color: var(--pastel-purple-border);
+  color: var(--pastel-purple-text);
+}
+
+/* 빈자리 카드 */
+.seat-card.empty {
+  background-color: #fafbfc;
+  border: 3px dashed #cbd5e0;
+  color: #a0aec0;
+  box-shadow: none;
+}
+.seat-card.empty:hover {
+  transform: none;
+}
+
+/* 자리 카드 내부 번호/라벨 표시 */
+.seat-number {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  opacity: 0.6;
+}
+
+/* 귀여운 학생 데코 아이콘 */
+.student-avatar {
+  font-size: 1.2rem; /* 아바타는 약간 작게 조절하여 텍스트 공간 확보 */
+  margin-bottom: 4px;
+}
+
+/* 섞기 동작 애니메이션 */
+@keyframes popIn {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 복사 알림 토스트 */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background-color: #2d3748;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  opacity: 0;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* 반응형 모바일 대응 */
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+    overflow: auto;
+  }
+  
+  .sidebar {
+    width: 100%;
+    min-width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .sidebar.collapsed {
+    margin-left: 0;
+    margin-top: -500px;
+  }
+  
+  .main-content {
+    height: auto;
+    overflow: visible;
+  }
+  
+  .seating-grid {
+    max-height: none;
+  }
+}
+
+/* 자리 지정 모달 스타일 */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  background: white;
+  width: 90%;
+  max-width: 440px;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+  transform: scale(0.9);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal.show .modal-content {
+  transform: scale(1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h3 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #4a5568;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: var(--text-muted);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modal-close-btn:hover {
+  color: var(--danger-color);
+}
+
+.modal-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 15px;
+}
+
+.modal-search-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+  background-color: #f8fafc;
+}
+
+.modal-search-input:focus {
+  border-color: var(--primary-color);
+  background-color: #ffffff;
+}
+
+.modal-student-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  padding-right: 4px;
+}
+
+.modal-student-grid::-webkit-scrollbar {
+  width: 6px;
+}
+.modal-student-grid::-webkit-scrollbar-track {
+  background: #f7fafc;
+}
+.modal-student-grid::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 3px;
+}
+
+.modal-student-btn {
+  padding: 10px 6px;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  background-color: #f7fafc;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  word-break: keep-all;
+}
+
+.modal-student-btn:hover {
+  border-color: var(--primary-color);
+  background-color: #ebf4ff;
+  color: var(--primary-hover);
+}
+
+.modal-student-btn.current {
+  background-color: var(--primary-color);
+  border-color: var(--primary-hover);
+  color: white;
+}
+
+.modal-student-btn.other-locked {
+  opacity: 0.5;
+  border-style: dashed;
+}
+
+.modal-action-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.modal-action-row .btn {
+  flex: 1;
+  padding: 10px;
+  font-size: 0.9rem;
+}
+
+/* 고정 배지 스타일 */
+.lock-badge {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 0.8rem;
+  background-color: #edf2f7;
+  padding: 2px 4px;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* 고정 상태의 카드 보더 색상 조정 및 마우스 포인터 */
+.seat-card {
+  cursor: pointer;
+}
+
+.seat-card.locked {
+  border-color: #cbd5e0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}

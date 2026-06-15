@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🏫 우리 반 자리 배치 프로그램</title>
+  <!-- 눈이 편안한 나눔스퀘어 라운드 폰트 적용 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- 좌측 설정 패널 -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <span class="logo-emoji">🎒</span>
+        <h2>우리 반 자리 배치</h2>
+      </div>
+      
+      <div class="input-group">
+        <label for="student-names">
+          <span>👥 학생 명단 입력</span>
+          <span class="helper-text">(한 줄에 한 명씩 입력)</span>
+        </label>
+        <textarea id="student-names" placeholder="김철수&#10;이영희&#10;박민수&#10;최지원"></textarea>
+        <div class="input-actions-row">
+          <div class="example-load-container">
+            <span>✨ 예시</span>
+            <input type="number" id="example-count" min="1" max="30" value="14" title="불러올 예시 이름 수">
+            <button type="button" id="btn-load-example" class="btn-text-link" title="입력한 명수만큼 샘플 이름을 채웁니다">명 넣기</button>
+          </div>
+          <div class="student-count-badge">
+            입력된 학생 수: <span id="student-count">0</span>명
+          </div>
+        </div>
+      </div>
+      
+      <div class="grid-setting-row">
+        <div class="input-group">
+          <label for="row-count">↕️ 행 (가로 줄)</label>
+          <input type="number" id="row-count" min="1" max="10" value="4">
+        </div>
+        <div class="input-group">
+          <label for="col-count">↔️ 열 (세로 칸)</label>
+          <input type="number" id="col-count" min="1" max="10" value="4">
+        </div>
+      </div>
+      
+      <div class="status-summary">
+        <div>총 자리 수: <span id="total-seats">16</span>칸</div>
+        <div id="seat-status-message">자리가 충분합니다.</div>
+      </div>
+
+      <div class="button-group">
+        <button id="btn-shuffle" class="btn btn-primary">🎲 자리 섞기</button>
+        <button id="btn-copy" class="btn btn-secondary">📋 결과 복사</button>
+        <button id="btn-reset" class="btn btn-danger">🔄 초기화</button>
+      </div>
+
+      <footer class="sidebar-footer">
+        <p>🔒 학생 데이터는 브라우저 내부(LocalStorage)에만 안전하게 저장되며, 외부로 전송되지 않습니다.</p>
+      </footer>
+    </aside>
+
+    <!-- 우측 자리표 출력 영역 -->
+    <main class="main-content">
+      <header class="main-header">
+        <button id="btn-toggle-sidebar" class="btn-toggle" title="설정창 열기/닫기">
+          <span class="toggle-icon">◀</span> <span class="toggle-text">설정창 접기</span>
+        </button>
+        
+        <div class="display-controls">
+          <span class="control-label">글자 크기:</span>
+          <button id="btn-font-decrease" class="btn-circle" title="글자 작게">가-</button>
+          <span id="font-size-percent" class="font-size-text">100%</span>
+          <button id="btn-font-increase" class="btn-circle" title="글자 크게">가+</button>
+          
+          <button id="btn-fullscreen" class="btn-circle btn-fullscreen-toggle" title="전체화면 토글">
+            📺
+          </button>
+        </div>
+      </header>
+
+      <!-- 칠판 표시 (교실 앞쪽 안내) -->
+      <div class="classroom-front">
+        <div class="chalkboard">
+          <span>👩‍🏫 칠 판 (앞 쪽)</span>
+        </div>
+      </div>
+
+      <!-- 동적으로 자리가 배치될 그리드 영역 -->
+      <div class="grid-wrapper">
+        <div id="seating-grid" class="seating-grid">
+          <!-- JS로 자리 카드가 동적 생성됩니다 -->
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 결과 복사 알림 토스트 -->
+  <div id="toast" class="toast">📋 결과가 클립보드에 복사되었습니다!</div>
+
+  <!-- 특정 자리 지정 모달 -->
+  <div id="assignment-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>📍 <span id="modal-seat-num">0</span>번 자리 학생 지정</h3>
+        <button id="modal-close" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">이 자리에 지정하여 고정할 학생을 선택해 주세요.<br>고정된 자리는 자리 섞기를 해도 변경되지 않습니다.</p>
+        <input type="text" id="modal-search" class="modal-search-input" placeholder="🔍 학생 이름 검색...">
+        
+        <div id="modal-student-list" class="modal-student-grid">
+          <!-- 학생 선택 버튼 동적 생성 -->
+        </div>
+        
+        <div class="modal-action-row">
+          <button id="btn-lock-empty" class="btn btn-secondary">🕳️ 빈자리로 고정</button>
+          <button id="btn-unlock-seat" class="btn btn-danger">🔓 고정 해제</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
