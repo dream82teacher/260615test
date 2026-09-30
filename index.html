@@ -2,130 +2,769 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🏫 우리 반 자리 배치 프로그램</title>
-  <!-- 눈이 편안한 나눔스퀘어 라운드 폰트 적용 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Padlet - 함께 생각하고 공유하는 디지털 캔버스</title>
+  
+  <!-- 웹 폰트: Pretendard & Noto Sans KR -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23FF3366%22/><text y=%22.9em%22 x=%22.18em%22 font-size=%2270%22 fill=%22white%22>P</text></svg>">
+  <!-- 카카오톡 공식 JavaScript SDK -->
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js"></script>
 </head>
-<body>
-  <div class="app-container">
-    
-    <!-- 좌측 설정 패널 -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <span class="logo-emoji">🎒</span>
-        <h2>우리 반 자리 배치</h2>
-      </div>
-      
-      <div class="input-group">
-        <label for="student-names">
-          <span>👥 학생 명단 입력</span>
-          <span class="helper-text">(한 줄에 한 명씩 입력)</span>
-        </label>
-        <textarea id="student-names" placeholder="김철수&#10;이영희&#10;박민수&#10;최지원"></textarea>
-        <div class="input-actions-row">
-          <div class="example-load-container">
-            <span>✨ 예시</span>
-            <input type="number" id="example-count" min="1" max="30" value="14" title="불러올 예시 이름 수">
-            <button type="button" id="btn-load-example" class="btn-text-link" title="입력한 명수만큼 샘플 이름을 채웁니다">명 넣기</button>
-          </div>
-          <div class="student-count-badge">
-            입력된 학생 수: <span id="student-count">0</span>명
-          </div>
+<body class="theme-dashboard">
+
+  <!-- ==============================================
+       최상단 네비게이션 바 (공통 헤더)
+       ============================================== -->
+  <header class="app-header">
+    <div class="header-left">
+      <!-- 패들렛 로고 -->
+      <div class="brand-logo" id="btn-nav-home" title="대시보드로 이동">
+        <div class="logo-mark">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="#FF3366"/>
+            <path d="M9 7H17C20.866 7 24 10.134 24 14C24 17.866 20.866 21 17 21H14V25H9V7Z" fill="white"/>
+            <circle cx="14" cy="14" r="2.5" fill="#FF3366"/>
+          </svg>
+        </div>
+        <div class="brand-name">
+          <span class="logo-text">padlet</span>
+          <span class="school-badge">에듀 클래스</span>
         </div>
       </div>
-      
-      <div class="grid-setting-row">
-        <div class="input-group">
-          <label for="row-count">↕️ 행 (가로 줄)</label>
-          <input type="number" id="row-count" min="1" max="10" value="4">
-        </div>
-        <div class="input-group">
-          <label for="col-count">↔️ 열 (세로 칸)</label>
-          <input type="number" id="col-count" min="1" max="10" value="4">
-        </div>
-      </div>
-      
-      <div class="status-summary">
-        <div>총 자리 수: <span id="total-seats">16</span>칸</div>
-        <div id="seat-status-message">자리가 충분합니다.</div>
-      </div>
 
-      <div class="button-group">
-        <button id="btn-shuffle" class="btn btn-primary">🎲 자리 섞기</button>
-        <button id="btn-copy" class="btn btn-secondary">📋 결과 복사</button>
-        <button id="btn-reset" class="btn btn-danger">🔄 초기화</button>
-      </div>
-
-      <footer class="sidebar-footer">
-        <p>🔒 학생 데이터는 브라우저 내부(LocalStorage)에만 안전하게 저장되며, 외부로 전송되지 않습니다.</p>
-      </footer>
-    </aside>
-
-    <!-- 우측 자리표 출력 영역 -->
-    <main class="main-content">
-      <header class="main-header">
-        <button id="btn-toggle-sidebar" class="btn-toggle" title="설정창 열기/닫기">
-          <span class="toggle-icon">◀</span> <span class="toggle-text">설정창 접기</span>
+      <!-- 보드 뷰일 때 나타나는 뒤로가기 및 제목 영역 -->
+      <div class="board-header-nav" id="board-header-nav" style="display: none;">
+        <button class="icon-btn-text" id="btn-back-to-dashboard" title="대시보드로 돌아가기">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          <span>대시보드</span>
         </button>
-        
-        <div class="display-controls">
-          <span class="control-label">글자 크기:</span>
-          <button id="btn-font-decrease" class="btn-circle" title="글자 작게">가-</button>
-          <span id="font-size-percent" class="font-size-text">100%</span>
-          <button id="btn-font-increase" class="btn-circle" title="글자 크게">가+</button>
-          
-          <button id="btn-fullscreen" class="btn-circle btn-fullscreen-toggle" title="전체화면 토글">
-            📺
+        <div class="nav-divider">/</div>
+        <div class="active-board-info" id="btn-edit-board-info" title="보드 정보 수정">
+          <span class="board-emoji-badge" id="board-nav-icon">💡</span>
+          <div class="board-title-group">
+            <h1 class="board-nav-title" id="board-nav-title">패들렛 제목</h1>
+            <span class="board-nav-desc" id="board-nav-desc">설명</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 헤더 중앙: 보드 뷰 레이아웃 전환 스위처 -->
+    <div class="header-center" id="board-header-controls" style="display: none;">
+      <div class="layout-segmented-control" title="보드 보기 방식 전환">
+        <button class="seg-btn active" data-layout="shelf" id="seg-btn-shelf">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="5" height="18" rx="1"/><rect x="10" y="3" width="5" height="18" rx="1"/><rect x="17" y="3" width="5" height="18" rx="1"/></svg>
+          <span>선반 (모둠별)</span>
+        </button>
+        <button class="seg-btn" data-layout="wall" id="seg-btn-wall">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="5" rx="1"/><rect x="13" y="10" width="8" height="11" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/></svg>
+          <span>담벼락 (벽돌형)</span>
+        </button>
+        <button class="seg-btn" data-layout="canvas" id="seg-btn-canvas">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7" cy="7" r="3"/><circle cx="17" cy="16" r="3"/><path d="M9.5 8.5l5 6"/></svg>
+          <span>자유 캔버스</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 헤더 우측: 검색 및 액션 버튼들 -->
+    <div class="header-right">
+      <!-- 대시보드 검색창 -->
+      <div class="header-search-wrap" id="header-search-wrap">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" id="global-search-input" placeholder="패들렛 또는 카드 검색...">
+      </div>
+
+      <!-- 보드 뷰 액션 버튼 그룹 -->
+      <div class="board-action-buttons" id="board-action-buttons" style="display: none;">
+        <button class="action-btn" id="btn-board-wallpaper" title="배경화면 테마 변경">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.563-2.512 5.563-5.563C22 6.5 17.5 2 12 2z"/></svg>
+          <span class="btn-label">배경</span>
+        </button>
+        <button class="action-btn" id="btn-board-share" title="공유 & QR 코드">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          <span class="btn-label">공유</span>
+        </button>
+        <button class="action-btn" id="btn-board-export" title="인쇄 및 내보내기">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          <span class="btn-label">인쇄</span>
+        </button>
+        <button class="action-btn icon-only" id="btn-board-settings" title="패들렛 상세 설정">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+
+      <!-- 새 패들렛 만들기 버튼 (대시보드 메인 액션) -->
+      <button class="btn-create-padlet" id="btn-header-new-padlet">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span>패들렛 만들기</span>
+      </button>
+
+      <!-- 카카오 로그인 & 사용자 프로필 영역 -->
+      <div class="auth-header-container" id="auth-header-container">
+        <!-- 로그인 전: 카카오 로그인 버튼 -->
+        <button class="btn-kakao-login" id="btn-kakao-login" title="카카오톡 계정으로 로그인">
+          <svg class="kakao-logo-icon" viewBox="0 0 24 24" width="16" height="16">
+            <path fill="#000000" d="M12 3C6.48 3 2 6.58 2 11c0 2.82 1.84 5.3 4.67 6.64-.2.74-.74 2.76-.86 3.19-.14.52.19.51.4.37.16-.11 2.54-1.74 3.59-2.45.71.1 1.45.15 2.2.15 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
+          </svg>
+          <span class="btn-kakao-text">카카오 로그인</span>
+        </button>
+
+        <!-- 로그인 후: 사용자 아바타 및 드롭다운 -->
+        <div class="user-profile-wrapper" id="user-profile-wrapper" style="display: none;">
+          <button class="user-profile-btn" id="btn-user-profile-toggle" title="내 프로필 & 계정 메뉴">
+            <div class="user-avatar-circle" id="user-avatar-display">
+              <span id="user-avatar-initial">쌤</span>
+            </div>
+            <span class="user-nickname-label" id="user-nickname-display">카카오 회원</span>
+            <svg class="dropdown-chevron" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+
+          <!-- 프로필 드롭다운 메뉴 -->
+          <div class="user-dropdown-menu" id="user-dropdown-menu" style="display: none;">
+            <div class="dropdown-user-info">
+              <div class="dropdown-avatar-circle" id="dropdown-avatar-display">
+                <span id="dropdown-avatar-initial">쌤</span>
+              </div>
+              <div class="dropdown-text-group">
+                <div class="dropdown-user-name" id="dropdown-user-name">카카오 회원</div>
+                <div class="dropdown-account-badge">
+                  <span class="badge-dot"></span>
+                  <span>카카오 연동됨</span>
+                </div>
+              </div>
+            </div>
+            <div class="dropdown-menu-divider"></div>
+            <button class="dropdown-action-item" id="btn-open-kakao-settings">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>카카오 API 키 관리</span>
+            </button>
+            <button class="dropdown-action-item danger-item" id="btn-kakao-logout">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              <span>로그아웃 (자료 유지)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==============================================
+       VIEW 1: 패들렛 대시보드 화면 (#view-dashboard)
+       ============================================== -->
+  <main class="app-view active" id="view-dashboard">
+    <div class="dashboard-layout">
+      
+      <!-- 대시보드 사이드바 -->
+      <aside class="dashboard-sidebar">
+        <nav class="sidebar-nav">
+          <button class="side-item active" data-filter="recents">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>최근 항목 (Recents)</span>
+            <span class="count-pill" id="badge-recent-count">3</span>
+          </button>
+          <button class="side-item" data-filter="starred">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span>즐겨찾기 (Starred)</span>
+            <span class="count-pill" id="badge-starred-count">1</span>
+          </button>
+          <button class="side-item" data-filter="shared">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>공유된 패들렛</span>
+          </button>
+          <button class="side-item" data-filter="templates">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+            <span>템플릿 갤러리</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-section-title">내 컬렉션 (폴더)</div>
+        <div class="sidebar-folders">
+          <button class="folder-item active" data-folder="all">
+            <span class="folder-dot dot-all"></span>
+            <span class="folder-name">전체 패들렛</span>
+          </button>
+          <button class="folder-item" data-folder="class">
+            <span class="folder-dot dot-class"></span>
+            <span class="folder-name">우리 반 수업 나눔</span>
+          </button>
+          <button class="folder-item" data-folder="project">
+            <span class="folder-dot dot-project"></span>
+            <span class="folder-name">모둠 프로젝트</span>
+          </button>
+          <button class="folder-item" data-folder="ideas">
+            <span class="folder-dot dot-ideas"></span>
+            <span class="folder-name">자유 아이디어</span>
           </button>
         </div>
-      </header>
 
-      <!-- 칠판 표시 (교실 앞쪽 안내) -->
-      <div class="classroom-front">
-        <div class="chalkboard">
-          <span>👩‍🏫 칠 판 (앞 쪽)</span>
+        <div class="sidebar-footer">
+          <div class="storage-info">
+            <div class="storage-bar"><div class="storage-fill" style="width: 40%;"></div></div>
+            <div class="storage-label">교육용 무제한 플랜 활성화됨</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 대시보드 메인 콘텐츠 -->
+      <section class="dashboard-content">
+        
+        <!-- 대시보드 웰컴 히어로 배너 -->
+        <div class="dashboard-hero-banner">
+          <div class="hero-text-content">
+            <div class="hero-tag">✨ 함께 만드는 디지털 협업 공간</div>
+            <h2 class="hero-title">아이디어를 나누고, 함께 생각을 꽃피우세요</h2>
+            <p class="hero-subtitle">모둠별 선반, 담벼락, 자유 캔버스로 쉽고 재미있게 수업과 토론을 진행해보세요.</p>
+            <div class="hero-quick-actions">
+              <button class="hero-btn-primary" id="btn-hero-new-padlet">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>새 패들렛 만들기</span>
+              </button>
+              <button class="hero-btn-secondary" id="btn-hero-join-code">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+                <span>참여 코드로 입장</span>
+              </button>
+            </div>
+          </div>
+          <div class="hero-illustration">
+            <div class="floating-sticker sticker-1">💡 "아이디어 발견!"</div>
+            <div class="floating-sticker sticker-2">🎨 "우와 멋지다!" ❤️</div>
+            <div class="floating-sticker sticker-3">🌱 "함께 실천하기"</div>
+          </div>
+        </div>
+
+        <!-- 패들렛 필터 & 레이아웃 탭 -->
+        <div class="dashboard-list-header">
+          <div class="list-title-wrap">
+            <h3 class="list-title" id="dashboard-list-title">최근 패들렛</h3>
+            <span class="board-total-count" id="dashboard-board-count">(3개)</span>
+          </div>
+
+          <div class="list-filter-pills">
+            <button class="filter-pill active" data-type="all">전체</button>
+            <button class="filter-pill" data-type="shelf">선반형</button>
+            <button class="filter-pill" data-type="wall">담벼락형</button>
+            <button class="filter-pill" data-type="canvas">캔버스형</button>
+          </div>
+        </div>
+
+        <!-- 패들렛 보드 카드 그리드 -->
+        <div class="padlet-grid" id="padlet-grid">
+          <!-- '+ 새 패들렛' 바로가기 카드 -->
+          <div class="padlet-card create-new-card" id="btn-grid-new-padlet">
+            <div class="create-new-icon">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </div>
+            <div class="create-new-title">새 패들렛 만들기</div>
+            <div class="create-new-sub">빈 캔버스 또는 추천 템플릿으로 시작</div>
+          </div>
+
+          <!-- 동적으로 렌더링되는 패들렛 카드 목록 -->
+        </div>
+
+        <!-- 템플릿 추천 섹션 -->
+        <div class="templates-section">
+          <div class="section-heading">
+            <h4 class="section-title">💡 수업에 바로 쓰는 인기 템플릿</h4>
+            <span class="section-sub">클릭 한 번으로 최적화된 서식의 보드를 만드세요</span>
+          </div>
+          <div class="templates-grid">
+            <div class="template-card" data-template="shelf-group">
+              <div class="template-icon">🤝</div>
+              <div class="template-info">
+                <div class="template-name">모둠별 협업 및 탐구 (선반형)</div>
+                <div class="template-desc">1모둠~4모둠 컬럼으로 나누어 실시간 아이디어 토론</div>
+              </div>
+              <button class="btn-use-template">사용하기</button>
+            </div>
+            <div class="template-card" data-template="wall-qa">
+              <div class="template-icon">❓</div>
+              <div class="template-info">
+                <div class="template-name">익명 질문 및 피드백 (담벼락형)</div>
+                <div class="template-desc">수업 중 자유롭게 궁금한 점을 질문하는 포스트잇 보드</div>
+              </div>
+              <button class="btn-use-template">사용하기</button>
+            </div>
+            <div class="template-card" data-template="canvas-brainstorm">
+              <div class="template-icon">🚀</div>
+              <div class="template-info">
+                <div class="template-name">창의 발명 마인드맵 (캔버스형)</div>
+                <div class="template-desc">자유롭게 포스트잇을 끌어다 놓고 연결하는 브레인스토밍</div>
+              </div>
+              <button class="btn-use-template">사용하기</button>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <!-- ==============================================
+       VIEW 2: 인터랙티브 패들렛 보드 화면 (#view-board)
+       ============================================== -->
+  <main class="app-view" id="view-board">
+    
+    <!-- 보드 작업 영역 (배경화면 테마가 여기에 적용됨) -->
+    <div class="board-workspace" id="board-workspace">
+      
+      <!-- 보드 상단 인포바 (모바일 또는 심플 뷰용) -->
+      <div class="board-info-banner" id="board-info-banner">
+        <div class="banner-title-area">
+          <span class="banner-emoji" id="banner-emoji">🌟</span>
+          <div>
+            <h2 class="banner-title" id="banner-title">보드 제목</h2>
+            <p class="banner-desc" id="banner-desc">설명이 여기에 나타납니다.</p>
+          </div>
+        </div>
+        <div class="banner-meta">
+          <span class="card-count-badge" id="banner-card-count">카드 0개</span>
+          <button class="btn-add-quick" id="btn-add-card-quick">+ 글 쓰기</button>
         </div>
       </div>
 
-      <!-- 동적으로 자리가 배치될 그리드 영역 -->
-      <div class="grid-wrapper">
-        <div id="seating-grid" class="seating-grid">
-          <!-- JS로 자리 카드가 동적 생성됩니다 -->
-        </div>
+      <!-- 보드 캔버스 컨테이너 (레이아웃에 따라 동적 변경) -->
+      <div class="board-canvas-area" id="board-canvas-area">
+        <!-- JS에서 Shelf, Wall, Canvas 구조를 렌더링합니다 -->
       </div>
-    </main>
-  </div>
 
-  <!-- 결과 복사 알림 토스트 -->
-  <div id="toast" class="toast">📋 결과가 클립보드에 복사되었습니다!</div>
+    </div>
 
-  <!-- 특정 자리 지정 모달 -->
-  <div id="assignment-modal" class="modal">
-    <div class="modal-content">
+    <!-- 우측 하단 플로팅 글쓰기 버튼 (Padlet 시그니처 핑크 플로팅 버튼) -->
+    <button class="fab-create-card" id="fab-add-card" title="새 카드 작성 (또는 보드 빈 곳 더블 클릭)">
+      <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+  </main>
+
+  <!-- ==============================================
+       MODAL 1: 새 패들렛 만들기 모달
+       ============================================== -->
+  <div class="modal-backdrop" id="modal-new-board" style="display: none;">
+    <div class="modal-box modal-medium">
       <div class="modal-header">
-        <h3>📍 <span id="modal-seat-num">0</span>번 자리 학생 지정</h3>
-        <button id="modal-close" class="modal-close-btn">&times;</button>
+        <h3 class="modal-title">새 패들렛 만들기</h3>
+        <button class="btn-modal-close" data-close="modal-new-board">&times;</button>
       </div>
       <div class="modal-body">
-        <p class="modal-desc">이 자리에 지정하여 고정할 학생을 선택해 주세요.<br>고정된 자리는 자리 섞기를 해도 변경되지 않습니다.</p>
-        <input type="text" id="modal-search" class="modal-search-input" placeholder="🔍 학생 이름 검색...">
         
-        <div id="modal-student-list" class="modal-student-grid">
-          <!-- 학생 선택 버튼 동적 생성 -->
+        <!-- 보드 기본 정보 -->
+        <div class="form-group">
+          <label class="form-label" for="new-board-title">패들렛 제목</label>
+          <div class="input-with-icon">
+            <span class="emoji-selector-btn" id="new-board-emoji-preview" title="아이콘 변경">🌟</span>
+            <input type="text" id="new-board-title" class="form-input" placeholder="예: 3학년 2반 생각 나눔터" value="우리 반 생각 나눔터">
+          </div>
         </div>
-        
-        <div class="modal-action-row">
-          <button id="btn-lock-empty" class="btn btn-secondary">🕳️ 빈자리로 고정</button>
-          <button id="btn-unlock-seat" class="btn btn-danger">🔓 고정 해제</button>
+
+        <div class="form-group">
+          <label class="form-label" for="new-board-desc">설명 (부제목)</label>
+          <input type="text" id="new-board-desc" class="form-input" placeholder="패들렛의 목적이나 참여 안내를 적어주세요." value="친구들과 자유롭게 의견을 나누고 칭찬을 나눠보아요!">
         </div>
+
+        <!-- 형식 / 레이아웃 선택 -->
+        <div class="form-group">
+          <label class="form-label">형식 (레이아웃) 선택</label>
+          <div class="layout-selector-cards">
+            <label class="layout-option-card">
+              <input type="radio" name="new-board-layout" value="shelf" checked>
+              <div class="option-inner">
+                <div class="option-icon">📋</div>
+                <div class="option-title">선반 (Shelf)</div>
+                <div class="option-desc">모둠별/주제별로 열을 나누어 의견을 수집합니다. (수업 추천!)</div>
+              </div>
+            </label>
+            <label class="layout-option-card">
+              <input type="radio" name="new-board-layout" value="wall">
+              <div class="option-inner">
+                <div class="option-icon">🧱</div>
+                <div class="option-title">담벼락 (Wall)</div>
+                <div class="option-desc">포스트잇이 벽돌처럼 빈틈없이 차곡차곡 채워집니다.</div>
+              </div>
+            </label>
+            <label class="layout-option-card">
+              <input type="radio" name="new-board-layout" value="canvas">
+              <div class="option-inner">
+                <div class="option-icon">🗺️</div>
+                <div class="option-title">캔버스 (Canvas)</div>
+                <div class="option-desc">원하는 위치에 자유롭게 끌어다 놓고 배치합니다.</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- 배경화면 테마 선택 -->
+        <div class="form-group">
+          <label class="form-label">배경화면 테마</label>
+          <div class="theme-thumbnail-picker">
+            <button type="button" class="theme-choice active" data-theme="chalkboard" title="초록 칠판">
+              <div class="theme-preview-box theme-chalkboard-preview"></div>
+              <span>칠판</span>
+            </button>
+            <button type="button" class="theme-choice" data-theme="corkboard" title="코르크 보드">
+              <div class="theme-preview-box theme-corkboard-preview"></div>
+              <span>코르크</span>
+            </button>
+            <button type="button" class="theme-choice" data-theme="aurora" title="파스텔 오로라">
+              <div class="theme-preview-box theme-aurora-preview"></div>
+              <span>오로라</span>
+            </button>
+            <button type="button" class="theme-choice" data-theme="grid-paper" title="모눈 종이">
+              <div class="theme-preview-box theme-grid-preview"></div>
+              <span>모눈</span>
+            </button>
+            <button type="button" class="theme-choice" data-theme="sakura" title="벚꽃 핑크">
+              <div class="theme-preview-box theme-sakura-preview"></div>
+              <span>벚꽃</span>
+            </button>
+            <button type="button" class="theme-choice" data-theme="midnight" title="밤하늘">
+              <div class="theme-preview-box theme-midnight-preview"></div>
+              <span>밤하늘</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" data-close="modal-new-board">취소</button>
+        <button class="btn-primary" id="btn-submit-new-board">만들기</button>
       </div>
     </div>
   </div>
 
+  <!-- ==============================================
+       MODAL 2: 카드 작성 및 편집 모달
+       ============================================== -->
+  <div class="modal-backdrop" id="modal-card-editor" style="display: none;">
+    <div class="modal-box modal-medium card-editor-box" id="card-editor-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="card-editor-modal-title">카드 작성하기</h3>
+        <button class="btn-modal-close" data-close="modal-card-editor">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- 카드 색상 선택 바 -->
+        <div class="card-color-picker-bar">
+          <span class="picker-label">카드 색상:</span>
+          <div class="color-dots">
+            <button type="button" class="color-dot color-white active" data-color="white" title="화이트"></button>
+            <button type="button" class="color-dot color-yellow" data-color="yellow" title="노랑"></button>
+            <button type="button" class="color-dot color-coral" data-color="coral" title="산호 핑크"></button>
+            <button type="button" class="color-dot color-mint" data-color="mint" title="민트"></button>
+            <button type="button" class="color-dot color-blue" data-color="blue" title="스카이 블루"></button>
+            <button type="button" class="color-dot color-purple" data-color="purple" title="라벤더"></button>
+          </div>
+        </div>
+
+        <!-- 소속 컬럼 (선반형일 때만 표시) -->
+        <div class="form-group" id="card-column-selector-wrap" style="display: none;">
+          <label class="form-label" for="card-column-select">구분 (열 선택)</label>
+          <select id="card-column-select" class="form-input"></select>
+        </div>
+
+        <!-- 카드 제목 -->
+        <div class="form-group">
+          <input type="text" id="card-input-title" class="form-input card-title-input" placeholder="제목을 입력하세요">
+        </div>
+
+        <!-- 카드 작성자 이름 -->
+        <div class="form-group author-input-wrap">
+          <span class="author-icon">👤</span>
+          <input type="text" id="card-input-author" class="form-input" placeholder="작성자 이름 (예: 민우, 2모둠)">
+        </div>
+
+        <!-- 카드 본문 내용 -->
+        <div class="form-group">
+          <textarea id="card-input-content" class="form-textarea" rows="4" placeholder="무슨 생각을 하고 계신가요? 자유롭게 이야기를 적어보세요..."></textarea>
+        </div>
+
+        <!-- 첨부된 미디어 미리보기 영역 -->
+        <div class="attachment-preview-area" id="card-attachment-preview" style="display: none;">
+          <div class="preview-media-wrap">
+            <img id="card-preview-image" src="" alt="첨부 이미지">
+            <button type="button" class="btn-remove-attachment" id="btn-remove-attachment" title="첨부 삭제">&times;</button>
+          </div>
+        </div>
+
+        <!-- 첨부 도구 탭 (사진, 그리기, 링크) -->
+        <div class="card-attachment-tools">
+          <div class="attachment-buttons">
+            <label class="attach-btn" title="사진 파일 첨부">
+              <input type="file" id="card-file-input" accept="image/*" style="display: none;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span>사진 첨부</span>
+            </label>
+
+            <button type="button" class="attach-btn" id="btn-open-drawing" title="직접 그리기 / 손글씨">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+              <span>손글씨/그리기</span>
+            </button>
+
+            <button type="button" class="attach-btn" id="btn-prompt-link" title="웹 링크 첨부">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              <span>웹 링크</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" data-close="modal-card-editor">취소</button>
+        <button class="btn-primary" id="btn-save-card">발행하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==============================================
+       MODAL 3: 손글씨 & 낙서 그리기 모달 (Drawing Tool)
+       ============================================== -->
+  <div class="modal-backdrop" id="modal-drawing-pad" style="display: none;">
+    <div class="modal-box modal-medium">
+      <div class="modal-header">
+        <h3 class="modal-title">🎨 손글씨 및 그림 그리기</h3>
+        <button class="btn-modal-close" data-close="modal-drawing-pad">&times;</button>
+      </div>
+      <div class="modal-body">
+        
+        <!-- 그리기 툴바 -->
+        <div class="drawing-toolbar">
+          <div class="draw-color-group">
+            <span class="draw-label">펜 색상:</span>
+            <button type="button" class="draw-color-btn active" data-color="#1e293b" style="background: #1e293b;"></button>
+            <button type="button" class="draw-color-btn" data-color="#ef4444" style="background: #ef4444;"></button>
+            <button type="button" class="draw-color-btn" data-color="#3b82f6" style="background: #3b82f6;"></button>
+            <button type="button" class="draw-color-btn" data-color="#10b981" style="background: #10b981;"></button>
+            <button type="button" class="draw-color-btn" data-color="#f59e0b" style="background: #f59e0b;"></button>
+            <button type="button" class="draw-color-btn" data-color="#8b5cf6" style="background: #8b5cf6;"></button>
+          </div>
+
+          <div class="draw-size-group">
+            <span class="draw-label">굵기:</span>
+            <button type="button" class="draw-size-btn" data-size="3">얇게</button>
+            <button type="button" class="draw-size-btn active" data-size="6">보통</button>
+            <button type="button" class="draw-size-btn" data-size="12">굵게</button>
+          </div>
+
+          <div class="draw-action-group">
+            <button type="button" class="btn-draw-tool" id="btn-draw-eraser">지우개</button>
+            <button type="button" class="btn-draw-tool" id="btn-draw-clear">모두 지우기</button>
+          </div>
+        </div>
+
+        <!-- 캔버스 그리기 영역 -->
+        <div class="drawing-canvas-wrap">
+          <canvas id="drawing-canvas" width="600" height="360"></canvas>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" data-close="modal-drawing-pad">취소</button>
+        <button class="btn-primary" id="btn-save-drawing">카드에 첨부하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==============================================
+       MODAL 4: 공유 & QR 코드 모달
+       ============================================== -->
+  <div class="modal-backdrop" id="modal-share" style="display: none;">
+    <div class="modal-box modal-small">
+      <div class="modal-header">
+        <h3 class="modal-title">패들렛 공유하기</h3>
+        <button class="btn-modal-close" data-close="modal-share">&times;</button>
+      </div>
+      <div class="modal-body share-modal-body">
+        
+        <!-- 실시간 QR 코드 렌더링 카드 -->
+        <div class="qr-code-card">
+          <div class="qr-image-wrapper" id="qr-code-container">
+            <!-- QR 코드 렌더링 위치 -->
+          </div>
+          <p class="qr-subtext">스마트폰이나 태블릿 카메라로 QR을 스캔하여 바로 접속하세요!</p>
+        </div>
+
+        <!-- 링크 복사 입력창 -->
+        <div class="share-link-group">
+          <label class="form-label">접속 링크</label>
+          <div class="copy-input-row">
+            <input type="text" id="share-link-input" class="form-input" readonly value="https://padlet.com/board/demo-class">
+            <button class="btn-primary btn-copy" id="btn-copy-share-link">복사</button>
+          </div>
+        </div>
+
+        <!-- 참여 코드 번호 안내 -->
+        <div class="share-code-box">
+          <span class="code-title">교실 참여 핀 번호</span>
+          <span class="code-number" id="share-pin-code">742 901</span>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" data-close="modal-share">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==============================================
+       MODAL 5: 배경화면 테마 변경 모달
+       ============================================== -->
+  <div class="modal-backdrop" id="modal-wallpaper" style="display: none;">
+    <div class="modal-box modal-medium">
+      <div class="modal-header">
+        <h3 class="modal-title">배경화면 테마 변경</h3>
+        <button class="btn-modal-close" data-close="modal-wallpaper">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="wallpaper-grid-options">
+          
+          <div class="wallpaper-opt-card" data-set-theme="chalkboard">
+            <div class="wp-preview theme-chalkboard-preview"></div>
+            <div class="wp-title">초록 칠판</div>
+            <div class="wp-sub">교실 분위기를 그대로 담은 클래식 칠판</div>
+          </div>
+
+          <div class="wallpaper-opt-card" data-set-theme="corkboard">
+            <div class="wp-preview theme-corkboard-preview"></div>
+            <div class="wp-title">코르크 보드</div>
+            <div class="wp-sub">포근하고 따뜻한 핀 게시판 감성</div>
+          </div>
+
+          <div class="wallpaper-opt-card" data-set-theme="aurora">
+            <div class="wp-preview theme-aurora-preview"></div>
+            <div class="wp-title">파스텔 오로라</div>
+            <div class="wp-sub">부드러운 그라디언트의 모던한 느낌</div>
+          </div>
+
+          <div class="wallpaper-opt-card" data-set-theme="grid-paper">
+            <div class="wp-preview theme-grid-preview"></div>
+            <div class="wp-title">방안 모눈종이</div>
+            <div class="wp-sub">정리 정돈된 깔끔한 노트 스타일</div>
+          </div>
+
+          <div class="wallpaper-opt-card" data-set-theme="sakura">
+            <div class="wp-preview theme-sakura-preview"></div>
+            <div class="wp-title">벚꽃 블라썸</div>
+            <div class="wp-sub">화사하고 산뜻한 봄날의 파스텔 핑크</div>
+          </div>
+
+          <div class="wallpaper-opt-card" data-set-theme="midnight">
+            <div class="wp-preview theme-midnight-preview"></div>
+            <div class="wp-title">은하수 밤하늘</div>
+            <div class="wp-sub">눈이 편안하고 차분한 다크 테마</div>
+          </div>
+
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" data-close="modal-wallpaper">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==============================================
+       MODAL 6: 카카오 로그인 & 연동 설정 모달
+       ============================================== -->
+  <div class="modal-backdrop" id="modal-kakao-auth" style="display: none;">
+    <div class="modal-box modal-medium">
+      <div class="modal-header">
+        <div class="kakao-modal-title-row">
+          <div class="kakao-icon-badge">
+            <svg viewBox="0 0 24 24" width="22" height="22">
+              <path fill="#000000" d="M12 3C6.48 3 2 6.58 2 11c0 2.82 1.84 5.3 4.67 6.64-.2.74-.74 2.76-.86 3.19-.14.52.19.51.4.37.16-.11 2.54-1.74 3.59-2.45.71.1 1.45.15 2.2.15 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="modal-title">카카오 계정 연동</h3>
+            <p class="modal-subtitle">카카오 로그인으로 학생·선생님 프로필을 연동하고 자료를 안전하게 보관하세요.</p>
+          </div>
+        </div>
+        <button class="btn-modal-close" data-close="modal-kakao-auth">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- 핵심 안내: 데이터 영속성 보장 -->
+        <div class="persistence-alert-banner">
+          <div class="alert-icon">🔒</div>
+          <div class="alert-text">
+            <strong>영구 보존 약속</strong>
+            <p>로그아웃을 하거나 브라우저 창을 닫아도, 작성하신 모든 패들렛 보드와 포스트잇, 댓글, 손글씨 그림은 브라우저에 안전하게 살아있습니다.</p>
+          </div>
+        </div>
+
+        <!-- 옵션 1: 공식 카카오톡 로그인 (SDK 연동) -->
+        <div class="auth-section-card">
+          <h4 class="auth-card-title">🟡 카카오 공식 계정으로 로그인</h4>
+          <p class="auth-card-desc">카카오 공식 인증 팝업을 통해 내 카카오톡 닉네임과 프로필로 로그인합니다.</p>
+          <button class="btn-kakao-big-login" id="btn-do-kakao-login">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path fill="#000000" d="M12 3C6.48 3 2 6.58 2 11c0 2.82 1.84 5.3 4.67 6.64-.2.74-.74 2.76-.86 3.19-.14.52.19.51.4.37.16-.11 2.54-1.74 3.59-2.45.71.1 1.45.15 2.2.15 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
+            </svg>
+            <span>카카오톡으로 로그인</span>
+          </button>
+        </div>
+
+        <!-- 옵션 1-B: 발급받은 액세스 토큰으로 즉시 로그인 -->
+        <div class="auth-section-card token-login-card">
+          <div class="card-tag token-tag">토큰 바로 연동</div>
+          <h4 class="auth-card-title">🔑 카카오 액세스 토큰(Access Token)으로 로그인</h4>
+          <p class="auth-card-desc">발급받으신 액세스 토큰으로 즉시 카카오 인증 계정을 연결합니다.</p>
+          <div class="key-input-row">
+            <input type="text" id="kakao-token-input" class="form-input" placeholder="액세스 토큰 입력" value="CoyQdiT42NBnozKk73F46dObbGSIBAjBAAAAAQoNDV8AAAGg8UzXV0PPWzORmYVE">
+            <button class="btn-primary" id="btn-login-with-token" style="white-space: nowrap;">토큰 적용</button>
+          </div>
+          <div id="token-status-text" class="key-status-text">입력된 토큰으로 즉시 로그인할 수 있습니다.</div>
+        </div>
+
+        <!-- 옵션 2: 1초 빠른 체험 로그인 (API 키 없이 즉시 테스트 가능) -->
+        <div class="auth-section-card test-account-card">
+          <div class="card-tag">원클릭 간편 로그인</div>
+          <h4 class="auth-card-title">⚡ 빠른 테스트 로그인</h4>
+          <p class="auth-card-desc">별도의 개발자 설정 없이도 카카오 사용자 프로필로 즉시 기능을 사용할 수 있습니다.</p>
+          <div class="quick-login-buttons">
+            <button class="btn-quick-login" data-nickname="카카오 선생님" data-avatar="👩‍🏫">👩‍🏫 카카오 선생님</button>
+            <button class="btn-quick-login" data-nickname="생각하는 학생" data-avatar="🎒">🎒 학생 계정</button>
+          </div>
+        </div>
+
+        <!-- 옵션 3: 카카오 개발자 JavaScript 키 직접 설정 -->
+        <div class="auth-section-card api-key-card">
+          <details id="kakao-key-accordion">
+            <summary class="api-key-summary">
+              <span>⚙️ 카카오 JavaScript 앱 키 설정</span>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+            </summary>
+            <div class="api-key-inputs">
+              <p class="api-guide-text">
+                <a href="https://developers.kakao.com" target="_blank" rel="noopener noreferrer">카카오 개발자 콘솔</a> &gt; [내 애플리케이션] &gt; [앱 키]에서 <strong>JavaScript 키</strong>를 입력하시면 공식 팝업이 즉시 활성화됩니다.
+              </p>
+              <div class="key-input-row">
+                <input type="text" id="kakao-js-key-input" class="form-input" placeholder="카카오 JavaScript 키 입력" value="de86f9696a69f263697decc8838d1aba">
+                <button class="btn-primary" id="btn-save-kakao-key">키 저장</button>
+              </div>
+              <div id="kakao-key-status" class="key-status-text" style="color: #16a34a; font-weight: 700;">✅ 등록된 키: de86f9696a69f263697decc8838d1aba (연동 완료)</div>
+            </div>
+          </details>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" data-close="modal-kakao-auth">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 토스트 알림 메시지 컴포넌트 -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- QR 코드 생성 라이브러리 (안전하고 가벼운 표준 라이브러리) -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <!-- 메인 스크립트 -->
   <script src="script.js"></script>
 </body>
 </html>
